@@ -1,5 +1,11 @@
 export interface IUser {
     id: string
     email: string
-    senha: string
+    password: string
+    imageUrl?: string;
+}
+
+export interface AuthResponse {
+  user: IUser;
+  accessToken: string;
 }

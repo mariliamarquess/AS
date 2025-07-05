@@ -15,26 +15,32 @@ import type z from "zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Loader from "@/components/shared/Loader"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import CookieManager from "@/helpers/Cookie"
+
 
 const SignupForm = () => {
+  const navigate = useNavigate();
   const isLoading = false;
-  // 1. Define your form.
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
       email: '',
-      senha: '',
+      password: '',
     },
   })
 
-  // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignupValidation>) {
-    try {
-      const newUser = await SignupApi.create(values);
-      console.log(newUser)
+        try {
+      const { accessToken, user } = await SignupApi.create(values);
+
+      CookieManager.setCookie("accessToken", accessToken, 30);
+      
+      console.log("Novo usuário criado:", user);
+
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      console.error("Erro no cadastro:", error);
     }
   }
   return (
@@ -60,7 +66,7 @@ const SignupForm = () => {
           />
           <FormField
             control={form.control}
-            name="senha"
+            name="password"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="shad-form_label">Password</FormLabel>
